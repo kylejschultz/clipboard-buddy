@@ -7,14 +7,15 @@ This simple Python based app provides a history for your clipboard, locally stor
 This tool was built because I often would copy a note, forget to paste it elsewhere, and have to go back and recreate the note again. With this tool, your previous clipboard entries aren't lost!
 ## Features
 ### Current Features
-* Saves up to 15 previous clipboard entries for re-copying and reusing later.
+- Saves up to 15 previous clipboard entries for re-copying and reusing later.
 - Option to clear the history
 - Locally stored - no cloud access 
 - Entries shortened to 25 characters for view.
 ### Future Features
 - [ ] Adjustable history count
 - [ ] Enable word wrap in menu vs truncation
-- [ ] 
+- [ ] Configure automatic build in GitHub Actions on PR/Merge
 
 ## Installation
 
+## Build

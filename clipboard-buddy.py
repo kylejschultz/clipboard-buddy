@@ -57,7 +57,12 @@ class ClipboardHistoryApp(rumps.App):
                 with shelve.open(os.path.join(self.storage_path, "clipboard_history_db")) as db:
                     db['history'] = self.clipboard_history
 
+    
+    
     def update_menu(self):
+        def get_version():
+            with open("src/version.txt", "r") as file:
+                return file.readline().strip()
         self.menu.clear()
         for item in reversed(self.clipboard_history):
             self.menu.add(rumps.MenuItem(item['display'], callback=self.copy_to_clipboard))
@@ -67,7 +72,7 @@ class ClipboardHistoryApp(rumps.App):
         about_menu.add(rumps.MenuItem("GitHub", callback=self.open_github))
         about_menu.add(rumps.MenuItem("Report Issue", callback=self.report_issue))
         about_menu.add(None)
-        about_menu.add(rumps.MenuItem("App Version 0.1"))
+        about_menu.add(rumps.MenuItem(f"App Version: {get_version()}"))        
         about_menu.add(rumps.MenuItem("Made by Kyle Schultz"))
         self.menu.add(about_menu)
 
@@ -79,5 +84,5 @@ class ClipboardHistoryApp(rumps.App):
             pb.setString_forType_(content_to_copy, NSPasteboardTypeString)
 
 if __name__ == "__main__":
-    app = ClipboardHistoryApp("", icon='icon.png')
+    app = ClipboardHistoryApp("", icon='src/icon.png')
     app.run()
