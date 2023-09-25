@@ -35,8 +35,8 @@ jobs:
         mkdir -p dist/dmg
         cp -r dist/clipboard-buddy.app dist/dmg
         create-dmg\
-          --volname "Clipboard Buddy"
-          --volicon "src/icon.icns"
+          --volname "Clipboard Buddy" \
+          --volicon "src/icon.icns" \
           --window-pos 200 120 \
           --window-size 600 300 \
           --icon-size 100 \
@@ -46,3 +46,13 @@ jobs:
           "dist/clipboard-buddy.app" \
           "dist/dmg/"
         ls -la /dist/dmg
+
+    - name: Push to Github Releases
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "pre-release"
+        prerelease: true
+        title: "Clipboard Buddy"
+        files: |
+          clipboard-buddy.zip
