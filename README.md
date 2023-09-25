@@ -24,6 +24,6 @@ Most clipboard managers offered things like cloud-sync and cross-platform compat
 To install, go to the release page to download the latest `.app` version of Clipboard Buddy.
 
 ## Build
-To build the app yourself, you will need to use [PyInstaller]{https://pyinstaller.org/en/stable/index.html}. 
+To build the app yourself, you will need to use [PyInstaller](https://pyinstaller.org/en/stable/index.html). 
 
 Simply use `pyinstaller cb.spec` to build a copy of the application with the proper files mounted. `Clipboard Buddy.app` will be available in the `dist` folder.
