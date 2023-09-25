@@ -4,7 +4,8 @@
 
 This simple Python based app provides a history for your clipboard, locally storing the last 15 clipboard entries in an easy-access Menu Bar app. 
 
-This tool was built because I often would copy a note, forget to paste it elsewhere, and have to go back and recreate the note again. With this tool, your previous clipboard entries aren't lost!
+Most clipboard managers offered things like cloud-sync and cross-platform compatability, which was more than I was looking for. What I needed was a simple list of the last handful of things I copied but I forgot to paste.
+
 ## Features
 ### Current Features
 - Saves up to 15 previous clipboard entries for re-copying and reusing later.
@@ -17,8 +18,12 @@ This tool was built because I often would copy a note, forget to paste it elsewh
     - [ ] Word wrap in menu vs truncation
     - [ ] Check for duplicates in history and ignore if already there (optional in settings)
 - [ ] Configure automatic build in GitHub Actions on PR/Merge
-
+- [ ] Add app to brew for easier installation.
 
 ## Installation
+To install, go to the release page to download the latest `.app` version of Clipboard Buddy.
 
 ## Build
+To build the app yourself, you will need to use [PyInstaller]{https://pyinstaller.org/en/stable/index.html}. 
+
+Simply use `pyinstaller cb.spec` to build a copy of the application with the proper files mounted. `Clipboard Buddy.app` will be available in the `dist` folder.
