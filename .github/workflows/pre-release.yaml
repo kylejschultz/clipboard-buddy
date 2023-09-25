@@ -1,5 +1,8 @@
 name: Pre-release Build
 on:
+  push:
+    branches:
+      - "main"
   workflow_dispatch:
 
 jobs:
@@ -26,11 +29,7 @@ jobs:
         pyinstaller cb.spec
       shell: bash
 
-    - uses: "marvinpinto/action-automatic-releases@latest"
-      with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        automatic_release_tag: "latest"
-        prerelease: true
-        title: "Clipboard Buddy DEV"
-        files: |
-          dist/Clipboard\ Buddy.app
+    - name: List dist directory
+      run: ls -la dist
+
+
