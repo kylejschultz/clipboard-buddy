@@ -21,7 +21,7 @@ Most clipboard managers offered things like cloud-sync and cross-platform compat
 - [ ] Add app to brew for easier installation.
 
 ## Installation
-To install, go to the release page to download the latest `.app` version of Clipboard Buddy.
+To install, go to the [release](https://github.com/kylejschultz/clipboard-buddy/releases) page and download the latest `dmg` file. You will likely receive a popup that the app cannot be installed as it is unsigned. You will need to go to __System Preferences__ > __Privacy & Security__ and allow the application to be installed.
 
 ## Build
 To build the app yourself, you will need to use [PyInstaller](https://pyinstaller.org/en/stable/index.html). 
