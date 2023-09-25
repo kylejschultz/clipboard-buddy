@@ -31,16 +31,17 @@ jobs:
 
     - name: Rename app output
       run: |
-        ls -la dist
-        zip clipboard-buddy.zip dist/Clipboard\ Buddy.app 
+        VERSION=$(cat src/version.txt)
+        mv dist/Clipboard\ Buddy.app clipboard-buddy-v$VERSION.app
+        zip clipboard-buddy.zip clipboard-buddy-v$VERSION.app
         ls -la dist
 
     - name: Push to Github Releases
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        automatic_release_tag: "latest"
+        automatic_release_tag: "development"
         prerelease: true
-        title: "Clipboard Buddy"
+        title: "clipboard buddy dev build"
         files: |
           clipboard-buddy.zip
