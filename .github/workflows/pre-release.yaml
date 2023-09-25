@@ -45,6 +45,7 @@ jobs:
           --app-drop-link 425 120 \
           "dist/clipboard-buddy.dmg" \
           "dist/dmg/"
+        mv dist/clipboard-buddy.dmg clipboard-buddy.dmg
 
     - name: Push to Github Releases
       uses: "marvinpinto/action-automatic-releases@latest"
@@ -54,4 +55,4 @@ jobs:
         prerelease: true
         title: "Clipboard Buddy"
         files: |
-          dist/clipboard-buddy.dmg
+          clipboard-buddy.dmg
