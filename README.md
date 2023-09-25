@@ -9,12 +9,15 @@ This tool was built because I often would copy a note, forget to paste it elsewh
 ### Current Features
 - Saves up to 15 previous clipboard entries for re-copying and reusing later.
 - Option to clear the history
-- Locally stored - no cloud access 
+- Stored locally using Python `shelve`
 - Entries shortened to 25 characters for view.
 ### Future Features
-- [ ] Adjustable history count
-- [ ] Enable word wrap in menu vs truncation
+- [ ] Settings dialogue
+    - [ ] Adjustable history count
+    - [ ] Word wrap in menu vs truncation
+    - [ ] Check for duplicates in history and ignore if already there (optional in settings)
 - [ ] Configure automatic build in GitHub Actions on PR/Merge
+
 
 ## Installation
 
