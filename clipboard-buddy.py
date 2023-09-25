@@ -1,3 +1,4 @@
+import sys
 import rumps
 from AppKit import (NSPasteboard, NSPasteboardTypeString, NSAlert, NSModalResponseOK)
 import shelve
@@ -15,6 +16,8 @@ class ClipboardHistoryApp(rumps.App):
         self.storage_path = os.path.expanduser('~/clipboard-buddy')
         if not os.path.exists(self.storage_path):
             os.makedirs(self.storage_path)
+        
+        self.quit_button = None
 
         with shelve.open(os.path.join(self.storage_path, "clipboard_history_db")) as db:
             self.clipboard_history = db.get('history', [])        
@@ -57,12 +60,16 @@ class ClipboardHistoryApp(rumps.App):
                 with shelve.open(os.path.join(self.storage_path, "clipboard_history_db")) as db:
                     db['history'] = self.clipboard_history
 
-    
+    def get_version(self):
+            if getattr(sys, 'frozen', False):
+                application_path = sys._MEIPASS
+            else:
+                application_path = os.path.dirname(os.path.abspath(__file__))
+            version_file = os.path.join(application_path, 'src', 'version.txt')
+            with open(version_file, 'r') as f:
+                return f.read().strip()
     
     def update_menu(self):
-        def get_version():
-            with open("src/version.txt", "r") as file:
-                return file.readline().strip()
         self.menu.clear()
         for item in reversed(self.clipboard_history):
             self.menu.add(rumps.MenuItem(item['display'], callback=self.copy_to_clipboard))
@@ -72,9 +79,14 @@ class ClipboardHistoryApp(rumps.App):
         about_menu.add(rumps.MenuItem("GitHub", callback=self.open_github))
         about_menu.add(rumps.MenuItem("Report Issue", callback=self.report_issue))
         about_menu.add(None)
-        about_menu.add(rumps.MenuItem(f"App Version: {get_version()}"))        
+        about_menu.add(rumps.MenuItem(f"App Version: {self.get_version()}"))        
         about_menu.add(rumps.MenuItem("Made by Kyle Schultz"))
         self.menu.add(about_menu)
+        self.menu.add(None)  # Separator line
+        self.menu.add(rumps.MenuItem("Quit", callback=self.quit_app))
+
+    def quit_app(self, _):
+        rumps.quit_application()
 
     def copy_to_clipboard(self, sender):
         pb = NSPasteboard.generalPasteboard()
@@ -84,5 +96,5 @@ class ClipboardHistoryApp(rumps.App):
             pb.setString_forType_(content_to_copy, NSPasteboardTypeString)
 
 if __name__ == "__main__":
-    app = ClipboardHistoryApp("", icon='src/icon.png')
+    app = ClipboardHistoryApp("", icon='src/icon.icns')
     app.run()
