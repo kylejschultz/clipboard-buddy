@@ -1,6 +1,8 @@
 name: Pre-release Build
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - "main"
 
 jobs:
   build:
@@ -19,7 +21,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install pyinstaller rumps
-        brew install create-dmg
 
     - name: Build app with pyinstaller
       run: |
@@ -27,31 +28,12 @@ jobs:
         pyinstaller cb.spec
       shell: bash
 
-    - name: Create dmg from app
-      run: |
-        mkdir -p dist/dmg
-        cp -r dist/clipboard-buddy.app dist/dmg
-        create-dmg\
-          --volname "Clipboard Buddy" \
-          --volicon "src/icon.icns" \
-          --window-pos 200 120 \
-          --window-size 600 300 \
-          --icon-size 100 \
-          --icon "clipboard-buddy.app" 175 120 \
-          --hide-extension "clipboard-buddy.app" \
-          --app-drop-link 425 120 \
-          "dist/clipboard-buddy.dmg" \
-          "dist/dmg/"
-        ls -a dist/
-        mv dist/clipboard-buddy.dmg clipboard-buddy.dmg
-        ls -a
-
-    - name: Push to Github Releases
+    - name: Push to Github Releases as 'dev-build'
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "pre-release"
         prerelease: true
-        title: "Clipboard Buddy"
+        title: "dev-build"
         files: |
-          clipboard-buddy.dmg
+          dist/clipboard-buddy.app
