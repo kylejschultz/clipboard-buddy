@@ -43,7 +43,7 @@ jobs:
           --icon "clipboard-buddy.app" 175 120 \
           --hide-extension "clipboard-buddy.app" \
           --app-drop-link 425 120 \
-          "dist/clipboard-buddy.app" \
+          "dist/clipboard-buddy.dmg" \
           "dist/dmg/"
         ls -la /dist/dmg
 
