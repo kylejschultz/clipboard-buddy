@@ -29,7 +29,18 @@ jobs:
         pyinstaller cb.spec
       shell: bash
 
-    - name: List dist directory
-      run: ls -la dist
+    - name: Rename app output
+      run: |
+        ls -la dist
+        mv dist/Clipboard\ Buddy.app dist/clipboard-buddy.app
+        ls -la dist
 
-
+    - name: Push to Github Releases
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "latest"
+        prerelease: true
+        title: "Clipboard Buddy"
+        files: |
+          dist/clipboard-buddy.app
