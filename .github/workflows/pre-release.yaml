@@ -1,0 +1,43 @@
+name: Pre-release Build
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller rumps
+
+    - name: Build app with pyinstaller
+      run: |
+        # Build app using spec with pyinstaller
+        pyinstaller cb.spec
+        # Read version from version.txt
+        VERSION=$(cat src/version.txt)
+        # Rename app to include version
+        mv dist/clipboard-buddy.app dist/clipboard-buddy-v$VERSION.app
+      shell: bash
+
+    - uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "latest"
+        prerelease: true
+        title: "Clipboard Buddy DEV"
+        files: |
+          dist/clipboard-buddy-v$VERSION.app
