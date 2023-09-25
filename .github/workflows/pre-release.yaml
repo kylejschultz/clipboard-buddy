@@ -24,10 +24,6 @@ jobs:
       run: |
         # Build app using spec with pyinstaller
         pyinstaller cb.spec
-        # Read version from version.txt
-        VERSION=$(cat src/version.txt)
-        # Rename app to include version
-        mv dist/Clipboard\ Buddy.app dist/clipboard-buddy-v$VERSION.app
       shell: bash
 
     - uses: "marvinpinto/action-automatic-releases@latest"
@@ -37,4 +33,4 @@ jobs:
         prerelease: true
         title: "Clipboard Buddy DEV"
         files: |
-          dist/clipboard-buddy-v$VERSION.app
+          dist/Clipboard\ Buddy.app
