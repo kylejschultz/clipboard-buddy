@@ -27,7 +27,7 @@ jobs:
         # Read version from version.txt
         VERSION=$(cat src/version.txt)
         # Rename app to include version
-        mv dist/clipboard-buddy.app dist/clipboard-buddy-v$VERSION.app
+        mv dist/Clipboard\ Buddy.app dist/clipboard-buddy-v$VERSION.app
       shell: bash
 
     - uses: "marvinpinto/action-automatic-releases@latest"
