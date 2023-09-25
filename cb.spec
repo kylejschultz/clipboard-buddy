@@ -44,7 +44,7 @@ coll = COLLECT(
 )
 app = BUNDLE(
     coll,
-    name='Clipboard Buddy.app',
+    name='clipboard-buddy.app',
     icon='src/icon.icns',
     bundle_identifier='com.kjschultz.clipboard-buddy',
     info_plist={

@@ -22,6 +22,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install pyinstaller rumps
+        brew install create-dmg
 
     - name: Build app with pyinstaller
       run: |
@@ -29,19 +30,19 @@ jobs:
         pyinstaller cb.spec
       shell: bash
 
-    - name: Rename app output
+    - name: Create dmg from app
       run: |
-        VERSION=$(cat src/version.txt)
-        mv dist/Clipboard\ Buddy.app clipboard-buddy-v$VERSION.app
-        zip clipboard-buddy.zip clipboard-buddy-v$VERSION.app
-        ls -la dist
-
-    - name: Push to Github Releases
-      uses: "marvinpinto/action-automatic-releases@latest"
-      with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        automatic_release_tag: "development"
-        prerelease: true
-        title: "clipboard buddy dev build"
-        files: |
-          clipboard-buddy.zip
+        mkdir -p dist/dmg
+        cp -r dist/clipboard-buddy.app dist/dmg
+        create-dmg\
+          --volname "Clipboard Buddy"
+          --volicon "src/icon.icns"
+          --window-pos 200 120 \
+          --window-size 600 300 \
+          --icon-size 100 \
+          --icon "clipboard-buddy.app" 175 120 \
+          --hide-extension "clipboard-buddy.app" \
+          --app-drop-link 425 120 \
+          "dist/clipboard-buddy.app" \
+          "dist/dmg/"
+        ls -la /dist/dmg
