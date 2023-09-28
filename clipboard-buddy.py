@@ -4,11 +4,33 @@ from AppKit import (NSPasteboard, NSPasteboardTypeString, NSAlert, NSModalRespon
 import shelve
 import os
 import webbrowser
+from PyQt6.QtWidgets import QApplication, QDialog, QVBoxLayout, QPushButton
 
 GITHUB_BASE_URL = "https://github.com/kylejschultz/clipboard-buddy/"
 
 def format_clipboard_content(content, max_length=25):
     return content if len(content) <= max_length else content[:max_length] + "..."
+
+class SettingsDialog(QDialog):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Settings")
+        self.resize(400, 600)
+        
+        layout = QVBoxLayout(self)
+        
+        save_button = QPushButton("Save", self)
+        close_button = QPushButton("Close", self)
+        
+        layout.addWidget(save_button)
+        layout.addWidget(close_button)
+        
+        save_button.clicked.connect(self.save_settings)
+        close_button.clicked.connect(self.close)
+
+    def save_settings(self):
+        # Logic to save settings goes here
+        self.accept()
 
 class ClipboardHistoryApp(rumps.App):
     def __init__(self, title, *args, **kwargs):
@@ -30,6 +52,12 @@ class ClipboardHistoryApp(rumps.App):
     @rumps.clicked("About", "Report Issue")
     def report_issue(self, _):
         webbrowser.open(GITHUB_BASE_URL + "issues")
+
+    @rumps.clicked("Settings")
+    def open_settings(self, _):
+        app = QApplication(sys.argv)
+        dialog = SettingsDialog()
+        dialog.exec()
 
     @rumps.clicked("Clear History")
     def clear_history(self, _):
@@ -70,11 +98,22 @@ class ClipboardHistoryApp(rumps.App):
                 return f.read().strip()
     
     def update_menu(self):
+        # Clear the Menu
         self.menu.clear()
+        
+        # Add clipboard history items
         for item in reversed(self.clipboard_history):
             self.menu.add(rumps.MenuItem(item['display'], callback=self.copy_to_clipboard))
-        self.menu.add(None)
+        self.menu.add(None)  # Separator line
+
+        # Add Clear History item
         self.menu.add(rumps.MenuItem("Clear History", callback=self.clear_history))
+        
+        # Add Settings item
+        self.menu.add(rumps.MenuItem("Settings", callback=self.open_settings))
+        self.menu.add(None)  # Separator line
+
+        # About submenu
         about_menu = rumps.MenuItem("About")
         about_menu.add(rumps.MenuItem("GitHub", callback=self.open_github))
         about_menu.add(rumps.MenuItem("Report Issue", callback=self.report_issue))
@@ -83,7 +122,10 @@ class ClipboardHistoryApp(rumps.App):
         about_menu.add(rumps.MenuItem("Made by Kyle Schultz"))
         self.menu.add(about_menu)
         self.menu.add(None)  # Separator line
-        self.menu.add(rumps.MenuItem("Quit", callback=self.quit_app))
+
+        # Ensure quit button always exists
+        if not any(item.title == "Quit" for item in self.menu):
+            self.menu.add(rumps.MenuItem("Quit", callback=self.quit_app))
 
     def quit_app(self, _):
         rumps.quit_application()
