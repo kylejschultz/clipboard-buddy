@@ -4,7 +4,8 @@ from AppKit import (NSPasteboard, NSPasteboardTypeString, NSAlert, NSModalRespon
 import shelve
 import os
 import webbrowser
-from PyQt6.QtWidgets import QApplication, QDialog, QVBoxLayout, QPushButton
+from PyQt6.QtWidgets import QApplication, QDialog, QVBoxLayout, QHBoxLayout, QPushButton
+from PyQt6.QtCore import Qt
 
 GITHUB_BASE_URL = "https://github.com/kylejschultz/clipboard-buddy/"
 
@@ -12,21 +13,58 @@ def format_clipboard_content(content, max_length=25):
     return content if len(content) <= max_length else content[:max_length] + "..."
 
 class SettingsDialog(QDialog):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, main_app, parent=None):
+        super().__init__(parent)
+        self.main_app = main_app  # Store reference to the main app
         self.setWindowTitle("Settings")
-        self.resize(400, 600)
-        
+        self.setFixedSize(300, 225)  # Adjusted to half of original height
+
         layout = QVBoxLayout(self)
-        
-        save_button = QPushButton("Save", self)
-        close_button = QPushButton("Close", self)
-        
-        layout.addWidget(save_button)
-        layout.addWidget(close_button)
-        
-        save_button.clicked.connect(self.save_settings)
-        close_button.clicked.connect(self.close)
+
+        # Clear history button
+        self.clear_history_btn = QPushButton("Clear History", self)
+        self.clear_history_btn.clicked.connect(self.clear_history)
+        layout.addWidget(self.clear_history_btn)
+
+        # Add some space between settings and the action buttons
+        layout.addSpacing(20)
+
+        # Using a horizontal layout for the Save and Close buttons
+        button_layout = QHBoxLayout()
+
+        # Save button
+        self.save_btn = QPushButton("Save", self)
+        self.save_btn.clicked.connect(self.save_settings)
+        button_layout.addWidget(self.save_btn)
+
+        # Close button (renamed from Exit)
+        self.close_btn = QPushButton("Close", self)
+        self.close_btn.clicked.connect(self.close)
+        button_layout.addWidget(self.close_btn)
+
+        layout.addLayout(button_layout)
+
+    def clear_history(self):
+        confirmation = NSAlert.alloc().init()
+        confirmation.setMessageText_("Clear History Confirmation")
+        confirmation.setInformativeText_("Are you sure you want to clear the clipboard history?")
+        confirmation.addButtonWithTitle_("Clear")
+        confirmation.addButtonWithTitle_("Cancel")
+
+        CLEAR_RESPONSE = 1000  # This is the response when the "Clear" button is clicked
+        response = confirmation.runModal()
+
+        if response == CLEAR_RESPONSE:
+            # Set flag to skip next clipboard check after clearing the history
+            self.main_app.skip_next_clipboard_check = True
+
+            print("Attempting to clear history...")
+            self.main_app.clipboard_history = []  # Use main_app's clipboard_history
+            print("History cleared in memory. Saving to DB...")
+            with shelve.open(os.path.join(self.main_app.storage_path, "clipboard_history_db")) as db:
+                db['history'] = self.main_app.clipboard_history
+            self.main_app.update_menu()
+            print("History saved to DB and menu updated.")
 
     def save_settings(self):
         # Logic to save settings goes here
@@ -44,6 +82,8 @@ class ClipboardHistoryApp(rumps.App):
         with shelve.open(os.path.join(self.storage_path, "clipboard_history_db")) as db:
             self.clipboard_history = db.get('history', [])        
             self.update_menu()  # Update the menu immediately after initializing
+        
+        self.skip_next_clipboard_check = False
 
     @rumps.clicked("About", "GitHub")
     def open_github(self, _):
@@ -56,25 +96,17 @@ class ClipboardHistoryApp(rumps.App):
     @rumps.clicked("Settings")
     def open_settings(self, _):
         app = QApplication(sys.argv)
-        dialog = SettingsDialog()
+        dialog = SettingsDialog(self)  # Pass a reference to the main app instance
+        dialog.setWindowModality(Qt.WindowModality.ApplicationModal)  # Set the window to be modal
+        dialog.show()
+        app.setActiveWindow(dialog)  # Ensure dialog is the active window
         dialog.exec()
-
-    @rumps.clicked("Clear History")
-    def clear_history(self, _):
-        confirmation = NSAlert.alloc().init()
-        confirmation.setMessageText_("Clear History Confirmation")
-        confirmation.setInformativeText_("Are you sure you want to clear the clipboard history?")
-        confirmation.addButtonWithTitle_("Clear")
-        confirmation.addButtonWithTitle_("Cancel")
-        response = confirmation.runModal()
-        if response == NSModalResponseOK:
-            self.clipboard_history = []
-            with shelve.open(os.path.join(self.storage_path, "clipboard_history_db")) as db:
-                db['history'] = self.clipboard_history
-            self.update_menu()
 
     @rumps.timer(1)
     def check_clipboard(self, _):
+        if self.skip_next_clipboard_check:
+            self.skip_next_clipboard_check = False
+            return
         pb = NSPasteboard.generalPasteboard()
         content = pb.stringForType_(NSPasteboardTypeString)
         if content:
@@ -105,9 +137,6 @@ class ClipboardHistoryApp(rumps.App):
         for item in reversed(self.clipboard_history):
             self.menu.add(rumps.MenuItem(item['display'], callback=self.copy_to_clipboard))
         self.menu.add(None)  # Separator line
-
-        # Add Clear History item
-        self.menu.add(rumps.MenuItem("Clear History", callback=self.clear_history))
         
         # Add Settings item
         self.menu.add(rumps.MenuItem("Settings", callback=self.open_settings))
